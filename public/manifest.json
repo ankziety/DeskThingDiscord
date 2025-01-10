@@ -5,9 +5,9 @@
   "isWebApp": true,
   "isLocalApp": false,
   "requires": [""],
-  "label": "Discord App",
-  "version": "0.10.1",
-  "version_code": "10.1",
+  "label": "DiscordThing",
+  "version": "0.1.0",
+  "version_code": "0.1",
   "compatible_server": ["10"],
   "compatible_client": ["10"],
 
