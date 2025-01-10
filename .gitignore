@@ -1,0 +1,26 @@
+
+\node_modules
+\dist
+/Legacy/CommunityApps
+/Legacy/mediawincs/DeskThingMedia/.vs
+/Legacy/mediawincs/DeskThingMedia/obj
+/Legacy/mediawincs/DeskThingMediaCLI/.vs
+/Legacy/mediawincs/DeskThingMediaCLI/obj
+/Legacy/mediawincs/DeskThingMediaCLI/bin
+/recordnowplaying/dist
+/Releases
+.vs/
+*.pdb
+/Releases
+/testingproj
+/.extras
+
+
+# Discord app local development stuff
+.env*
+
+# Do not push distro_zip results or any zip
+*.zip
+
+# Discord old reference stuff
+jail/
