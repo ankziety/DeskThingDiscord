@@ -1,0 +1,19 @@
+{
+  "id": "discord",
+  "isAudioSource": false,
+  "isScreenSaver": false,
+  "isWebApp": true,
+  "isLocalApp": false,
+  "requires": [""],
+  "label": "Discord App",
+  "version": "0.10.1",
+  "version_code": "10.1",
+  "compatible_server": ["10"],
+  "compatible_client": ["10"],
+
+  "description": "It's discord but on the DeskThing... get it?",
+  "author": "ankziety",
+  "platforms": ["windows", "macos", "linux"],
+  "homepage": "https://github.com/ankziety/DeskThingDiscord",
+  "repository": "https://github.com/ankziety/DeskThingDiscord"
+}
