@@ -1,8 +1,8 @@
 # Deskthing Discord App
 
-> [!NOTE] > **v0.10.0**<br>
-> Code by: **Ankziety**<br>
-> Based on code by: **Riprod**
+> **v0.0.1**<br>
+> *Code by:* **Ankziety**<br>
+> *Based on code by:* **Riprod**
 
 **How to Make a Discord Developer Team and App**
 
