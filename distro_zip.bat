@@ -1,0 +1,1 @@
+powershell Compress-Archive -Force dist/* index.zip
