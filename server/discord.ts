@@ -195,7 +195,7 @@ class DiscordHandler {
 
   // Add or update a user in the connected users list
   async mergeUserData(newUser: UserData) {
-    const existingUserIndex = this.connectedUserList.findIndex(
+    let existingUserIndex = this.connectedUserList.findIndex(
       (user) => user.id === newUser.id
     );
 
@@ -205,38 +205,29 @@ class DiscordHandler {
         ...this.connectedUserList[existingUserIndex],
         ...newUser,
       };
-      // New user data to mess with
-
-      const userId = this.connectedUserList[existingUserIndex].id;
-      const userAvatar = this.connectedUserList[existingUserIndex].avatar;
-
-      // Encode the image and update the user profile
-      this.connectedUserList[existingUserIndex] = {
-        ...this.connectedUserList[existingUserIndex],
-        profile: await this.DeskThingServer.encodeImageFromUrl(
-          `https://cdn.discordapp.com/avatars/${userId}/${userAvatar}.png`
-        ),
-      };
-
-      this.DeskThingServer.sendLog(
-        `User ${this.connectedUserList[existingUserIndex].username} has joined the chat`
-      );
-
-      // if (sendData) {
-      //   this.sendDataToClients(
-      //     [this.connectedUsers[existingUserIndex]],
-      //     "update"
-      //   );
-      // }
-      return this.connectedUserList[existingUserIndex];
     } else {
       // Add new user to the list
-      this.connectedUserList.push(newUser);
-      await this.mergeUserData(newUser);
-      // if (sendData) {
-      //   this.sendDataToClients([newUser], "update");
-      // }
+      existingUserIndex = this.connectedUserList.push(newUser) - 1;
     }
+
+    // Now we have new user data to mess with
+
+    // Encode the image and update the user profile
+    this.connectedUserList[existingUserIndex].profile =
+      await this.fetchUserProfilePicture(newUser);
+
+    this.DeskThingServer.sendLog(
+      `User ${this.connectedUserList[existingUserIndex].username} had data merged.\nc_usr_lst_length: ${this.connectedUserList.length}\nexst_usr_i: ${existingUserIndex}`
+    );
+
+    return this.connectedUserList[existingUserIndex];
+  }
+
+  async fetchUserProfilePicture(user: UserData) {
+    const pfp = await this.DeskThingServer.encodeImageFromUrl(
+      `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+    );
+    return pfp;
   }
 
   // Handle when a user joins the voice channel
@@ -602,9 +593,10 @@ class DiscordHandler {
 
     this.recentChannels.push(this.selectedChannel);
     this.selectedChannel = null;
-    this.connectedUserList = this.connectedUserList.filter(
-      (u) => u.id == this.rpc.user?.id
-    );
+    this.connectedUserList = [];
+    // this.connectedUserList.filter(
+    //   (u) => u.id == this.rpc.user?.id
+    // );
   }
 
   async setUserVoiceState(voice_state: UserVoiceState) {
