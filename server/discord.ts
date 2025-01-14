@@ -515,16 +515,6 @@ class DiscordHandler {
         "[Server] Channel could not be fetched"
       );
 
-    // await this.unsubscribe();
-
-    // if (this.selectedChannel != null) {
-    //   this.DeskThingServer.sendError("[Server] Selected channel is not null");
-    //   this.recentChannels.push(this.selectedChannel);
-    //   this.DeskThingServer.sendLog(
-    //     `[Server] Channel ${this.selectedChannel.id} added to recent channels`
-    //   );
-    // }
-
     this.selectedChannel = channel;
     this.DeskThingServer.sendLog(
       `Set the selected channel to ${this.selectedChannel?.id}`
