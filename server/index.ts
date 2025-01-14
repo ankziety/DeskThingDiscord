@@ -113,6 +113,7 @@ const handleGet = (data: SocketData) => {
   //   // Ignore data not intended for the discord app
   //   return;
   // }
+  // DeskThingServer.sendLog(`New data get request ${JSON.stringify(data)}`);
 
   if (!data.request) {
     DeskThingServer.sendError("No request provided in 'get' data.");
