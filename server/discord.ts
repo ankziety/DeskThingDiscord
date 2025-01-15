@@ -130,7 +130,6 @@ class DiscordHandler {
 
       // Handle voice channel selection events
       // this.rpc.on("VOICE_CHANNEL_SELECT", async (args) => {
-      //   await this.handleVoiceChannelSelect(args.channel_id);
       // });
 
       // Handle voice state changes
@@ -180,17 +179,6 @@ class DiscordHandler {
     } catch (ex) {
       this.DeskThingServer.sendError(`RPC: Error initializing RPC: ${ex}`);
     }
-  }
-
-  // Handle when a voice channel is selected
-  async handleVoiceChannelSelect(channelId: string) {
-    if (channelId != null && channelId != this.selectedChannel?.id) {
-      // Unsubscribe from previous voice channel events if any
-      await this.handleClientChannelSelect();
-    } else
-      this.DeskThingServer.sendError(
-        `[Server] Joined the same call without leaving ${channelId} ${this.selectedChannel?.id}`
-      );
   }
 
   // Add or update a user in the connected users list
@@ -306,12 +294,16 @@ class DiscordHandler {
       profile: undefined,
     };
 
-    await this.mergeUserData(userData);
+    const mergedUser = await this.mergeUserData(userData);
+    if (!mergedUser)
+      throw this.DeskThingServer.sendError(
+        "A user triggered a voice state update in the channel and it caused an error"
+      );
 
     this.DeskThingServer.sendDataToClient({
       app: "discord",
       type: "voice_data",
-      payload: userData,
+      payload: mergedUser,
     });
   }
 
@@ -390,8 +382,6 @@ class DiscordHandler {
 
       // this.DeskThingServer.sendLog("Unsubscribing from all voice channels");
       await this.clearSelectedChannel();
-      this.subscriptions.voice = {};
-      this.connectedUserList = [];
     }
   }
 
@@ -583,10 +573,8 @@ class DiscordHandler {
 
     this.recentChannels.push(this.selectedChannel);
     this.selectedChannel = null;
+    this.subscriptions.voice = {};
     this.connectedUserList = [];
-    // this.connectedUserList.filter(
-    //   (u) => u.id == this.rpc.user?.id
-    // );
   }
 
   async setUserVoiceState(voice_state: UserVoiceState) {

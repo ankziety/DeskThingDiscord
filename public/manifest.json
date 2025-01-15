@@ -6,8 +6,8 @@
   "isLocalApp": false,
   "requires": [""],
   "label": "DiscordThing",
-  "version": "0.1.0",
-  "version_code": "0.1",
+  "version": "0.1.1",
+  "version_code": "0.1.1",
   "compatible_server": ["10"],
   "compatible_client": ["10"],
 
