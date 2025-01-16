@@ -1,6 +1,6 @@
 # DiscordThing <sub>_for DeskThing_</sub>
 
-> **v0.1.2**<br>_Code by:_ **Ankziety**<br>_Based on code by:_ **Riprod**
+> _Code by:_ **Ankziety**<br> _Based on code by:_ **Riprod**
 
 ## How to Install on DeskThing
 
