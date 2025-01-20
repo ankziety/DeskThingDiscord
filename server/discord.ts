@@ -5,13 +5,14 @@ import { discordData, UserData, UserVoiceState } from "../src/types/discord.d";
 
 type subscriptions = {
   voice: { [key: string]: Subscription[] };
+  text: { [key: string]: Subscription[] };
 };
 
 class DiscordHandler {
   private DeskThingServer: DeskThing;
   // @ts-ignore
   private rpc: RPC.Client = new RPC.Client({ transport: "ipc" });
-  private subscriptions: subscriptions = { voice: {} };
+  private subscriptions: subscriptions = { voice: {}, text: {} };
   private startTimestamp: Date | null;
   private redirect_url: string;
   private scopes: string[];
@@ -25,7 +26,6 @@ class DiscordHandler {
   constructor(DeskThing: DeskThing) {
     this.DeskThingServer = DeskThing;
     // Initialize properties
-    this.subscriptions = { voice: {} };
     this.startTimestamp = null;
     this.connectedUserList = [];
     this.redirect_url = "http://localhost:8888/callback/discord";
@@ -61,7 +61,7 @@ class DiscordHandler {
 
       RPC.register(this.client_id);
       await this.unsubscribe();
-      this.subscriptions = { voice: {} };
+      this.subscriptions = { voice: {}, text: {} };
       await this.initializeRpc();
       await this.login();
     } catch (exception) {
@@ -80,7 +80,6 @@ class DiscordHandler {
 
       if (!this.token) {
         // Authorize and get the access token
-        // @ts-ignore - The 'authorize' method may not be in the type definitions
         this.token = await this.rpc.authorize({
           scopes: this.scopes,
           clientSecret: this.client_secret,
@@ -101,6 +100,25 @@ class DiscordHandler {
     } catch (exception) {
       this.DeskThingServer.sendError(`Discord RPC Error: ${exception}`);
     }
+  }
+
+  // Subscribe to necessary Discord RPC events
+  async setSubscribe() {
+    this.DeskThingServer.sendLog(
+      "Subscribing to voice channels and connection status"
+    );
+    await this.rpc.subscribe("VOICE_CHANNEL_SELECT", {});
+    await this.rpc.subscribe("VOICE_CONNECTION_STATUS", {});
+    await this.rpc.subscribe("NOTIFICATION_CREATE", {});
+    await this.rpc.subscribe("MESSAGE_CREATE", {
+      channel_id: "1146262790248615956",
+    });
+    await this.rpc.subscribe("MESSAGE_DELETE", {
+      channel_id: "1146262790248615956",
+    });
+    await this.rpc.subscribe("MESSAGE_UPDATE", {
+      channel_id: "1146262790248615956",
+    });
   }
 
   // Initialize RPC event handlers and subscriptions
@@ -183,32 +201,33 @@ class DiscordHandler {
 
   // Add or update a user in the connected users list
   async mergeUserData(newUser: UserData) {
-    let existingUserIndex = this.connectedUserList.findIndex(
+    let foundUserIndex = this.connectedUserList.findIndex(
       (user) => user.id === newUser.id
     );
 
-    if (existingUserIndex != -1) {
+    if (foundUserIndex != -1) {
       // Update existing user data
-      this.connectedUserList[existingUserIndex] = {
-        ...this.connectedUserList[existingUserIndex],
+      this.connectedUserList[foundUserIndex] = {
+        ...this.connectedUserList[foundUserIndex],
         ...newUser,
       };
     } else {
       // Add new user to the list
-      existingUserIndex = this.connectedUserList.push(newUser) - 1;
+      foundUserIndex = this.connectedUserList.push(newUser) - 1;
     }
 
     // Now we have new user data to mess with
 
     // Encode the image and update the user profile
-    this.connectedUserList[existingUserIndex].profile =
+    this.connectedUserList[foundUserIndex].profile =
       await this.fetchUserProfilePicture(newUser);
 
     this.DeskThingServer.sendLog(
-      `User ${this.connectedUserList[existingUserIndex].username} had data merged.\nc_usr_lst_length: ${this.connectedUserList.length}\nexst_usr_i: ${existingUserIndex}`
+      `User ${this.connectedUserList[foundUserIndex].username} had data merged.\nc_usr_lst_length: ${this.connectedUserList.length}\nexst_usr_i: ${foundUserIndex}`
     );
+    this.DeskThingServer.sendLog(JSON.stringify(this.connectedUserList));
 
-    return this.connectedUserList[existingUserIndex];
+    return this.connectedUserList[foundUserIndex];
   }
 
   async fetchUserProfilePicture(user: UserData) {
@@ -243,7 +262,6 @@ class DiscordHandler {
         "A user joined the channel and it caused an error"
       );
 
-    // Send full call data to ensure all clients are in sync
     this.DeskThingServer.sendDataToClient({
       app: "discord",
       type: "channel_member",
@@ -282,16 +300,12 @@ class DiscordHandler {
 
     const userData = {
       id: args.user.id,
-      username: args.user.username,
       nick: args.nick,
-      speaking: false,
       volume: args.volume,
       // @ts-expect-error
       mute: args.voice_state.mute || args.voice_state.self_mute,
       // @ts-expect-error
       deaf: args.voice_state.deaf || args.voice_state.self_deaf,
-      avatar: args.user.avatar,
-      profile: undefined,
     };
 
     const mergedUser = await this.mergeUserData(userData);
@@ -449,16 +463,6 @@ class DiscordHandler {
     }
   }
 
-  // Subscribe to necessary Discord RPC events
-  async setSubscribe() {
-    this.DeskThingServer.sendLog(
-      "Subscribing to voice channels and connection status"
-    );
-    await this.rpc.subscribe("VOICE_CHANNEL_SELECT", {});
-    await this.rpc.subscribe("VOICE_CONNECTION_STATUS", {});
-    await this.rpc.subscribe("NOTIFICATION_CREATE", {});
-  }
-
   async refreshCallData() {
     this.selectedChannel = await this.rpc.getSelectedChannel();
 
@@ -466,6 +470,7 @@ class DiscordHandler {
       app: "discord",
       type: "channel_info",
       request: "channel_banner",
+      // @ts-ignore
       payload: this.selectedChannel,
     });
 
@@ -515,22 +520,28 @@ class DiscordHandler {
     // Subscribe to voice events for the selected channel
     this.subscriptions.voice[this.selectedChannel!.id] = [
       await this.rpc.subscribe("VOICE_STATE_UPDATE", {
+        // @ts-ignore
         channel_id: this.selectedChannel.id,
       }),
       await this.rpc.subscribe("VOICE_STATE_CREATE", {
+        // @ts-ignore
         channel_id: this.selectedChannel.id,
       }),
       await this.rpc.subscribe("VOICE_STATE_DELETE", {
+        // @ts-ignore
         channel_id: this.selectedChannel.id,
       }),
       await this.rpc.subscribe("SPEAKING_START", {
+        // @ts-ignore
         channel_id: this.selectedChannel.id,
       }),
       await this.rpc.subscribe("SPEAKING_STOP", {
+        // @ts-ignore
         channel_id: this.selectedChannel.id,
       }),
     ];
     this.DeskThingServer.sendLog(
+      // @ts-ignore
       `Subscribed to voice events for channel ${this.selectedChannel.id}`
     );
 
@@ -538,6 +549,7 @@ class DiscordHandler {
       app: "discord",
       type: "channel_info",
       request: "channel_banner",
+      // @ts-ignore
       payload: this.selectedChannel,
     });
 
@@ -551,7 +563,9 @@ class DiscordHandler {
 
   async hydrateUsers() {
     this.DeskThingServer.sendLog("[Server] Attempting to hydrate users");
+    // @ts-ignore
     if (this.selectedChannel.voice_states) {
+      // @ts-ignore
       for (const voiceState of this.selectedChannel.voice_states) {
         if (voiceState.user) await this.mergeUserData(voiceState.user);
       }

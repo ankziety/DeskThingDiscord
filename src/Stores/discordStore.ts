@@ -1,6 +1,6 @@
 import { DeskThing } from "deskthing-client";
 import { SocketData } from "deskthing-client/dist/types";
-import { Channel } from "discord-rpc";
+import { Channel } from "@ankziety/discord-rpc";
 import { UserData } from "../types/discord";
 
 type EventUpdateCallbacks = (data: any) => void;
