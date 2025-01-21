@@ -17,7 +17,8 @@ const main = async () => {
   if (
     !data?.settings?.auto_switch_view ||
     !data.settings?.notifications ||
-    !data.settings?.activity
+    !data.settings?.activity ||
+    !data.settings?.dm_notifications
   ) {
     DeskThingServer.addSettings({
       auto_switch_view: {
@@ -25,15 +26,15 @@ const main = async () => {
         type: "boolean",
         value: false,
       },
-      notifications: {
-        label: "Show Notifications",
-        type: "boolean",
-        value: false,
-      },
       activity: {
         label: "Display Activity",
         type: "boolean",
         value: false,
+      },
+      dm_notifications: {
+        label: "Display DM Notifications",
+        type: "boolean",
+        value: true,
       },
     });
   }
