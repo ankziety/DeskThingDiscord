@@ -7,6 +7,8 @@ import {
   IconUserCircle,
 } from "../assets/icons";
 import ChannelBanner from "./ChannelBanner";
+import NotificationBanner from "./NotificationBannner";
+// import NotificationList from "./NotificationList";
 // import UserDetailPanel from "./UserDetailPanel";
 import { UserData } from "../types/discord";
 
@@ -14,10 +16,23 @@ export const Call = () => {
   const [callData, setCallData] = useState<UserData[]>(
     discordStore.getCallData()
   );
+  // const [notifications, setNotifications] = useState<any[]>([]);
+  const [currentNotification, setCurrentNotification] = useState<any | null>(
+    null
+  );
   // const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
 
   const handleCallDataUpdate = (data: UserData[]) => {
     setCallData(data);
+  };
+
+  const addNotification = (notif: any) => {
+    // setNotifications((notifs) => [...notifs, notif]);
+    setCurrentNotification(notif);
+  };
+
+  const handleNotificationClose = () => {
+    setCurrentNotification(null);
   };
 
   // const handleSelectUser = (user: UserData) => {
@@ -27,11 +42,16 @@ export const Call = () => {
   useEffect(() => {
     // Request initial call data
 
-    const unsubscribe = discordStore.subscribeToCallData(handleCallDataUpdate);
+    const removeCallDataListener =
+      discordStore.subscribeToCallData(handleCallDataUpdate);
+    const removeNotificationListener =
+      discordStore.subscribeToNotificationData(addNotification);
+
     discordStore.requestCallData();
 
     return () => {
-      unsubscribe();
+      removeCallDataListener();
+      removeNotificationListener();
     };
   }, []);
 
@@ -43,6 +63,13 @@ export const Call = () => {
 
   return (
     <div className="flex flex-col w-screen h-screen bg-gray-900 text-white">
+      {currentNotification && (
+        <NotificationBanner
+          notification={currentNotification}
+          onClose={handleNotificationClose}
+        />
+      )}
+      {/* <NotificationList notifications={notifications} /> */}
       {/* Channel information banner */}
       <ChannelBanner />
       {/* Participants display area */}
@@ -104,7 +131,7 @@ export const Call = () => {
             </div>
           ))
         ) : (
-          <p className="text-center">No participants in the call.</p>
+          <p className="text-center">participants in the call.</p>
         )}
       </div>
       {/* )} */}

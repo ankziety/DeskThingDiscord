@@ -26,6 +26,11 @@ interface ChannelMemberDataTransport extends SocketData {
   payload: UserData | { id: string };
 }
 
+interface NotificationDataTransport extends SocketData {
+  type: "notification_data";
+  payload: { id: string; body: string; title: string };
+}
+
 class DiscordStore {
   private DeskThingClient: DeskThing;
   private static instance: DiscordStore;
@@ -37,10 +42,15 @@ class DiscordStore {
 
   private callDataSubscriberCallbacks: EventUpdateCallbacks[] = [];
   private channelDataSubscriberCallbacks: EventUpdateCallbacks[] = [];
-  // private notificationDataSubscriberCallbacks: EventUpdateCallbacks[] = [];
+  private notificationDataSubscriberCallbacks: EventUpdateCallbacks[] = [];
 
   private activeCallMemberData: UserData[] = [];
-  //private notificationStack: userData[] = [] // Will be used later for notifications
+  private notificationStack: {
+    id: string;
+    body: string;
+    title: string;
+    stackTimestamp: Date;
+  }[] = []; // Will be used later for notifications
 
   // Channel data and callbacks for channel updates
   private channelData: Channel | null = null;
@@ -51,8 +61,10 @@ class DiscordStore {
   private constructor() {
     this.DeskThingClient = DeskThing.getInstance();
 
-    // this.listeners.push(this.DeskThingClient.on("notification_data", this.handleNotificationData))
-
+    this.listeners.push(
+      // @ts-expect-error
+      this.DeskThingClient.on("notification_data", this.handleNotificationData)
+    );
     this.listeners.push(
       // @ts-expect-error
       this.DeskThingClient.on("speaking_data", this.handleSpeakingData)
@@ -86,7 +98,7 @@ class DiscordStore {
    */
 
   // Subscribe to updates in channel data
-  subscribeToChannelData(callback: (data: any) => void) {
+  subscribeToChannelData(callback: EventUpdateCallbacks) {
     this.channelDataSubscriberCallbacks.push(callback);
     return () => {
       this.channelDataSubscriberCallbacks =
@@ -103,15 +115,15 @@ class DiscordStore {
     };
   }
 
-  // subscribeToNotificationData(callback: EventUpdateCallbacks) {
-  //   this.notificationDataSubscriberCallbacks.push(callback);
-  //   return () => {
-  //     this.notificationDataSubscriberCallbacks =
-  //       this.notificationDataSubscriberCallbacks.filter(
-  //         (cb) => cb !== callback
-  //       );
-  //   };
-  // }
+  subscribeToNotificationData(callback: EventUpdateCallbacks) {
+    this.notificationDataSubscriberCallbacks.push(callback);
+    return () => {
+      this.notificationDataSubscriberCallbacks =
+        this.notificationDataSubscriberCallbacks.filter(
+          (cb) => cb !== callback
+        );
+    };
+  }
 
   /**
    * Data Publishers
@@ -128,6 +140,12 @@ class DiscordStore {
   private publishChannelData() {
     this.channelDataSubscriberCallbacks.forEach((callback) =>
       callback(this.channelData)
+    );
+  }
+
+  private publishNotificationData() {
+    this.notificationDataSubscriberCallbacks.forEach((callback) =>
+      callback(this.notificationStack[this.notificationStack.length - 1])
     );
   }
 
@@ -240,6 +258,14 @@ class DiscordStore {
         this.publishCallData();
         delete this.speakingUpdateTimeout[userId];
       }, 100); // 100ms debounce
+    }
+  };
+
+  handleNotificationData = (data: NotificationDataTransport) => {
+    const payload = { ...data.payload, stackTimestamp: new Date() };
+    if (payload) {
+      this.notificationStack.push(payload);
+      this.publishNotificationData();
     }
   };
 

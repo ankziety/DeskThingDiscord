@@ -368,7 +368,23 @@ class DiscordHandler {
    * Event Handlers
    */
 
-  async handleNotificationCreate(args: discordData) {}
+  async handleNotificationCreate(args: any) {
+    this.DeskThingServer.sendLog(
+      `Handling Notification Create: ${JSON.stringify(args)}`
+    );
+    const notificationData = {
+      title: args.title,
+      body: args.body,
+      id: args.message.id,
+    };
+    if (notificationData) {
+      this.DeskThingServer.sendDataToClient({
+        app: "discord",
+        type: "notification_data",
+        payload: notificationData,
+      });
+    }
+  }
 
   // Handle when a user joins the voice channel
   async handleVoiceStateCreate(args: discordData) {
