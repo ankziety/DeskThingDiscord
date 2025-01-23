@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import discordStore from "../Stores/discordStore";
-import { Channel } from "discord-rpc";
+import { Channel } from "@ankziety/discord-rpc";
 
 interface ChannelBannerProps {}
 

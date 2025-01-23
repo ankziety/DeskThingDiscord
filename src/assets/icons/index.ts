@@ -9,3 +9,5 @@ export { default as IconMicDiscord } from "./IconMicDiscord";
 export { default as IconMicOffDiscord } from "./IconMicOffDiscord";
 export { default as IconVolumeUp } from "./IconVolumeUp";
 export { default as IconVolumeDown } from "./IconVolumeDown";
+export { default as IconBell } from "./NotificationBell.tsx";
+export { default as IconBellOn } from "./NotificationBellWithDot.tsx";

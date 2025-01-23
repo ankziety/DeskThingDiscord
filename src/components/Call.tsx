@@ -7,7 +7,7 @@ import {
   IconUserCircle,
 } from "../assets/icons";
 import ChannelBanner from "./ChannelBanner";
-import NotificationBanner from "./NotificationBannner";
+import NotificationBanner from "./NotificationBanner";
 // import NotificationList from "./NotificationList";
 // import UserDetailPanel from "./UserDetailPanel";
 import { UserData } from "../types/discord";
@@ -47,7 +47,7 @@ export const Call = () => {
     const removeNotificationListener =
       discordStore.subscribeToNotificationData(addNotification);
 
-    discordStore.requestCallData();
+    // discordStore.requestCallData();
 
     return () => {
       removeCallDataListener();
@@ -131,7 +131,20 @@ export const Call = () => {
             </div>
           ))
         ) : (
-          <p className="text-center">participants in the call.</p>
+          <p
+            className="text-center text-gray-500"
+            onClick={() =>
+              addNotification({
+                title: "test",
+                body: "This is a test notification, but it is longer, you could say mid length, maybe even long, who knows? Now it is a bit longer than expected, but it is a test nonetheless. Let's see if it works! Ok, let's make it even longer to test the limits of the notification system. Is this too long? Let's find out!",
+                id: "1",
+                stackTimestamp: new Date(),
+              })
+            }
+          >
+            {" "}
+            click me for notif
+          </p>
         )}
       </div>
       {/* )} */}
