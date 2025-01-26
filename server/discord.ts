@@ -1,6 +1,6 @@
 // @ts-ignore
 import RPC, { Channel, Subscription } from "@ankziety/discord-rpc";
-import { DeskThing } from "deskthing-server";
+import { DeskThingClass } from "deskthing-server";
 import { discordData, UserData, UserVoiceState } from "../src/types/discord.d";
 
 type subscriptions = {
@@ -8,7 +8,7 @@ type subscriptions = {
 };
 
 class DiscordHandler {
-  private DeskThingServer: DeskThing;
+  private DeskThingServer: DeskThingClass;
   // @ts-ignore
   private rpc: RPC.Client = new RPC.Client({ transport: "ipc" });
   private subscriptions: subscriptions = { voice: {} };
@@ -22,7 +22,7 @@ class DiscordHandler {
   private selectedChannel: Channel | null = null;
   private recentChannels: Channel[];
 
-  constructor(DeskThing: DeskThing) {
+  constructor(DeskThing: DeskThingClass) {
     this.DeskThingServer = DeskThing;
     // Initialize properties
     this.startTimestamp = null;
@@ -278,15 +278,16 @@ class DiscordHandler {
 
   async refreshCallData() {
     this.selectedChannel = await this.rpc.getSelectedChannel();
-
-    this.DeskThingServer.sendDataToClient({
+    if (!this.selectedChannel)
+      throw this.DeskThingServer.sendError("Selected channel is null");
+    this.DeskThingServer.send({
       app: "discord",
       type: "channel_info",
       request: "channel_banner",
       payload: this.selectedChannel,
     });
 
-    this.DeskThingServer.sendDataToClient({
+    this.DeskThingServer.send({
       app: "discord",
       type: "client_data",
       request: "refresh_call",
@@ -378,7 +379,7 @@ class DiscordHandler {
       id: args.message.id,
     };
     if (notificationData) {
-      this.DeskThingServer.sendDataToClient({
+      this.DeskThingServer.send({
         app: "discord",
         type: "notification_data",
         payload: notificationData,
@@ -412,7 +413,7 @@ class DiscordHandler {
       );
 
     // Send full call data to ensure all clients are in sync
-    this.DeskThingServer.sendDataToClient({
+    this.DeskThingServer.send({
       app: "discord",
       type: "channel_member",
       request: "connect",
@@ -430,7 +431,7 @@ class DiscordHandler {
       (user) => user.id !== args.user.id
     );
 
-    this.DeskThingServer.sendDataToClient({
+    this.DeskThingServer.send({
       app: "discord",
       type: "channel_member",
       request: "disconnect",
@@ -465,7 +466,7 @@ class DiscordHandler {
         "A user voice state changed and it caused an error"
       );
 
-    this.DeskThingServer.sendDataToClient({
+    this.DeskThingServer.send({
       app: "discord",
       type: "voice_data",
       payload: mergedUser,
@@ -483,7 +484,7 @@ class DiscordHandler {
     );
     if (existingUser) {
       existingUser.speaking = true;
-      this.DeskThingServer.sendDataToClient({
+      this.DeskThingServer.send({
         app: "discord",
         payload: { id: args.user_id, speaking: true },
         type: "speaking_data",
@@ -501,7 +502,7 @@ class DiscordHandler {
     );
     if (existingUser) {
       existingUser.speaking = false;
-      this.DeskThingServer.sendDataToClient({
+      this.DeskThingServer.send({
         app: "discord",
         payload: { id: args.user_id, speaking: false },
         type: "speaking_data",
@@ -521,7 +522,7 @@ class DiscordHandler {
         (await this.DeskThingServer.getData())?.settings?.auto_switch_view
           ?.value
       ) {
-        this.DeskThingServer.sendDataToClient({
+        this.DeskThingServer.send({
           app: "client",
           type: "set",
           request: "view",
@@ -529,7 +530,7 @@ class DiscordHandler {
         });
       }
 
-      this.DeskThingServer.sendDataToClient({
+      this.DeskThingServer.send({
         app: "discord",
         type: "client_data",
         request: "join",
@@ -539,7 +540,7 @@ class DiscordHandler {
 
       this.DeskThingServer.sendLog("Connecting to a voice channel");
     } else if (args.state === "DISCONNECTED") {
-      this.DeskThingServer.sendDataToClient({
+      this.DeskThingServer.send({
         app: "discord",
         type: "client_data",
         request: "leave",
@@ -613,7 +614,7 @@ class DiscordHandler {
       id: this.rpc.user?.id,
       ...data.payload,
     });
-    this.DeskThingServer.sendDataToClient({
+    this.DeskThingServer.send({
       app: "discord",
       type: "voice_data",
       payload: {
@@ -632,8 +633,10 @@ class DiscordHandler {
       );
 
     this.selectedChannel = channel;
+    if (!this.selectedChannel)
+      throw this.DeskThingServer.sendError("[Server] Selected channel is null");
     this.DeskThingServer.sendLog(
-      `Set the selected channel to ${this.selectedChannel?.id}`
+      `Set the selected channel to ${this.selectedChannel?.name}`
     );
 
     await this.hydrateUsers();
@@ -660,14 +663,14 @@ class DiscordHandler {
       `Subscribed to voice events for channel ${this.selectedChannel.id}`
     );
 
-    this.DeskThingServer.sendDataToClient({
+    this.DeskThingServer.send({
       app: "discord",
       type: "channel_info",
       request: "channel_banner",
       payload: this.selectedChannel,
     });
 
-    this.DeskThingServer.sendDataToClient({
+    this.DeskThingServer.send({
       app: "discord",
       type: "client_data",
       request: "refresh_call",

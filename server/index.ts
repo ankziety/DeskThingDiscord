@@ -1,8 +1,8 @@
 import DiscordHandler from "./discord";
 import { DeskThing as DK, SocketData } from "deskthing-server";
-const DeskThingServer = DK.getInstance();
-export { DeskThingServer as DeskThing };
+export { DK as DeskThing };
 
+const DeskThingServer = DK;
 let discord: DiscordHandler;
 
 const main = async () => {

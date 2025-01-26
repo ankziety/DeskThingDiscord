@@ -1,38 +1,19 @@
 import { DeskThing } from "deskthing-client";
 import { SocketData } from "deskthing-client/dist/types";
-import { Channel } from "discord-rpc";
-import { UserData } from "../types/discord";
+import { Channel } from "@ankziety/discord-rpc";
+import {
+  ChannelInfoTransport,
+  ChannelMemberDataTransport,
+  NotificationDataTransport,
+  UserData,
+  VoiceActivityDataTransport,
+  VoiceStateDataTransport,
+} from "../types/discord";
 
 type EventUpdateCallbacks = (data: any) => void;
 
-interface VoiceActivityDataTransport extends SocketData {
-  type: "speaking_data";
-  payload: { id: string; speaking: boolean };
-}
-
-interface ChannelInfoTransport extends SocketData {
-  type: "channel_info";
-  payload: Channel;
-}
-
-interface VoiceStateDataTransport extends SocketData {
-  type: "voice_state";
-  payload: { id: string; mute: boolean; deaf: boolean };
-}
-
-interface ChannelMemberDataTransport extends SocketData {
-  type: "channel_member";
-  request: "connect" | "disconnect";
-  payload: UserData | { id: string };
-}
-
-interface NotificationDataTransport extends SocketData {
-  type: "notification_data";
-  payload: { id: string; body: string; title: string };
-}
-
 class DiscordStore {
-  private DeskThingClient: DeskThing;
+  private DeskThingClient: typeof DeskThing;
   private static instance: DiscordStore;
   private listeners: (() => void)[] = [];
 
@@ -59,7 +40,7 @@ class DiscordStore {
   private speakingUpdateTimeout: { [key: string]: NodeJS.Timeout } = {};
 
   private constructor() {
-    this.DeskThingClient = DeskThing.getInstance();
+    this.DeskThingClient = DeskThing;
 
     this.listeners.push(
       // @ts-expect-error

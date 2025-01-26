@@ -8,7 +8,7 @@ interface UserDetailPanelProps {
 }
 
 const UserDetailPanel: React.FC<UserDetailPanelProps> = ({ user, onBack }) => {
-  const deskthing = DeskThing.getInstance();
+  const deskthing = DeskThing;
   const [tempVolume, setTempVolume] = useState(user.volume ?? 100);
   const [tempMute, setTempMute] = useState(user.mute ?? false);
 

@@ -70,7 +70,6 @@ export const Call = () => {
         />
       )}
       {/* <NotificationList notifications={notifications} /> */}
-      {/* Channel information banner */}
       <ChannelBanner />
       {/* Participants display area */}
       {/* {selectedUser ? (
@@ -79,6 +78,7 @@ export const Call = () => {
           onBack={() => setSelectedUser(null)}
         />
       ) : ( */}
+      {/* Channel information banner */}
       <div className="flex-1 flex flex-wrap justify-center items-center p-4 overflow-y-auto">
         {callData && callData.length > 0 ? (
           callData.map((participant) => (
@@ -143,7 +143,7 @@ export const Call = () => {
             }
           >
             {" "}
-            click me for notif
+            No participants in the call
           </p>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { User } from "discord-rpc";
+import { User } from "@ankziety/discord-rpc";
 
 type ACTION_TYPES = "speaking" | "connect" | "disconnect" | "update" | "status";
 
@@ -78,3 +78,116 @@ export type discordData = {
   mute: boolean;
   [key: string]: string | boolean | undefined | User | UserVoiceState | number;
 };
+
+// Root Interface for the first JSON block
+interface Notification {
+  channel_id: string;
+  message: Message;
+  icon_url: string;
+  title: string;
+  body: string;
+}
+
+// Common Message Interface
+interface Message {
+  id: string;
+  content: string;
+  content_parsed: ContentParsed[];
+  nick: string;
+  author_color?: string;
+  ß;
+  timestamp: string;
+  tts: boolean;
+  mentions: Mention[];
+  mention_roles: any[];
+  embeds: any[];
+  attachments: any[];
+  author: Author;
+  pinned: boolean;
+  type: number;
+}
+
+// ContentParsed Union Types
+type ContentParsed = MentionParsed | TextParsed;
+
+interface MentionParsed {
+  userId: string;
+  channelId: string;
+  guildId: string;
+  parsedUserId: string;
+  content: ParsedContent[];
+  type: "mention";
+}
+
+interface TextParsed {
+  type: "text";
+  content: string;
+  originalMatch: OriginalMatch;
+}
+
+interface ParsedContent {
+  type: string;
+  content: string;
+}
+
+interface OriginalMatch {
+  [key: string]: string | number;
+}
+
+// Mention Interface
+interface Mention {
+  avatar: string | null;
+  clan: string | null;
+  discriminator: string;
+  id: string;
+  primary_guild: string | null;
+  username: string;
+  publicFlags: number;
+  avatarDecorationData: AvatarDecorationData | null;
+  globalName: string;
+}
+
+// AvatarDecorationData Interface
+interface AvatarDecorationData {
+  asset: string;
+  skuId: string;
+}
+
+// Author Interface
+interface Author {
+  id: string;
+  username: string;
+  discriminator: string;
+  global_name: string;
+  avatar: string;
+  avatar_decoration_data: any | null; // Adjust the type if you have more details
+  bot: boolean;
+  flags: number;
+  premium_type: number;
+}
+
+interface VoiceActivityDataTransport extends SocketData {
+  type: "speaking_data";
+  payload: { id: string; speaking: boolean };
+}
+
+interface ChannelInfoTransport extends SocketData {
+  type: "channel_info";
+  payload: Channel;
+}
+
+interface VoiceStateDataTransport extends SocketData {
+  type: "voice_state";
+  payload: { id: string; mute: boolean; deaf: boolean };
+}
+
+interface ChannelMemberDataTransport extends SocketData {
+  type: "channel_member";
+  request: "connect" | "disconnect";
+  payload: UserData | { id: string };
+}
+
+interface NotificationDataTransport extends SocketData {
+  type: "notification_data";
+  payload: Notification;
+}

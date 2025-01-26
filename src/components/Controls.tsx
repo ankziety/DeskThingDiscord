@@ -11,7 +11,7 @@ import { DeskThing } from "deskthing-client";
 interface ControlsProps {}
 
 const Controls: React.FC<ControlsProps> = () => {
-  const deskthing = DeskThing.getInstance();
+  const deskthing = DeskThing;
   const [muted, setMuted] = useState(false);
   const [deafened, setDeafened] = useState(false);
   const [helenKeller, setHelenKeller] = useState(false);
