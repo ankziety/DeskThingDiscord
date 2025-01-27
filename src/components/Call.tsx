@@ -47,7 +47,7 @@ export const Call = () => {
     const removeNotificationListener =
       discordStore.subscribeToNotificationData(addNotification);
 
-    // discordStore.requestCallData();
+    discordStore.requestCallData();
 
     return () => {
       removeCallDataListener();
@@ -87,7 +87,7 @@ export const Call = () => {
               className="flex flex-col items-center m-3"
               // onClick={() => handleSelectUser(participant)}
             >
-              {participant.username ? (
+              {participant.profile ? (
                 <div className="relative w-40 h-40">
                   {/* Participant's avatar with speaking indication */}
                   <div
@@ -104,7 +104,7 @@ export const Call = () => {
                       className="inset-0 w-full h-full overflow-hidden rounded-full"
                       style={{
                         backgroundSize: "cover",
-                        backgroundPosition: "center",
+                        backgroundRepeat: "no-repeat",
                         background: `url(${participant.profile})`,
                       }}
                     />

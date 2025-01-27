@@ -247,11 +247,9 @@ class DiscordHandler {
 
     // Encode the image and update the user profile
     this.connectedUserList[existingUserIndex].profile =
-      await this.fetchUserProfilePicture(newUser);
-
-    this.DeskThingServer.sendLog(
-      `User ${this.connectedUserList[existingUserIndex].username} had data merged.\nc_usr_lst_length: ${this.connectedUserList.length}\nexst_usr_i: ${existingUserIndex}`
-    );
+      await this.fetchUserProfilePicture(
+        this.connectedUserList[existingUserIndex]
+      );
 
     return this.connectedUserList[existingUserIndex];
   }
@@ -316,6 +314,11 @@ class DiscordHandler {
         sub.unsubscribe()
       );
       delete this.subscriptions.voice[this.selectedChannel.id];
+      this.DeskThingServer.sendLog(
+        `Unsubscribed from channel ${
+          this.selectedChannel.id
+        }\nVoice subscriptions: ${JSON.stringify(this.subscriptions.voice)}`
+      );
     }
 
     this.recentChannels.push(this.selectedChannel);
@@ -365,6 +368,14 @@ class DiscordHandler {
     return user;
   }
 
+  destroy() {
+    this.unsubscribe();
+    this.DeskThingServer.sendLog("Unsubscribed from all events channel events");
+    this.rpc.clearActivity();
+    this.rpc.destroy();
+    this.DeskThingServer.sendLog("Discord RPC client destroyed");
+  }
+
   /**
    * Event Handlers
    */
@@ -398,9 +409,10 @@ class DiscordHandler {
       nick: args.nick,
       speaking: false,
       volume: args.volume,
-      // @ts-expect-error
-      mute: args.voice_state.mute || args.voice_state.self_mute,
-      // @ts-expect-error
+      mute:
+        args.voice_state.mute ||
+        args.voice_state.self_mute ||
+        args.voice_state.suppress,
       deaf: args.voice_state.deaf || args.voice_state.self_deaf,
       avatar: args.user.avatar,
       profile: undefined,

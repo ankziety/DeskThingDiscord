@@ -130,11 +130,13 @@ const handleGet = (data: SocketData) => {
 };
 
 // Start the DeskThing
-DeskThingServer.on("start", main);
+DeskThingServer.once("start", main);
 
-DeskThingServer.on("stop", () => {
+DeskThingServer.once("stop", () => {
   DeskThingServer.sendError("Stopping discord application");
   if (discord) {
-    discord.unsubscribe();
+    discord.destroy();
+    DeskThingServer.off("set", handleSet);
+    DeskThingServer.off("get", handleGet);
   }
 });
