@@ -8,9 +8,7 @@ import {
 } from "../assets/icons";
 import { DeskThing } from "deskthing-client";
 
-interface ControlsProps {}
-
-const Controls: React.FC<ControlsProps> = () => {
+const Controls: React.FC<object> = () => {
   const deskthing = DeskThing;
   const [muted, setMuted] = useState(false);
   const [deafened, setDeafened] = useState(false);

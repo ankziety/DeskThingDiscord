@@ -1,15 +1,16 @@
-// @ts-ignore
-import RPC, { Channel, Subscription } from "@ankziety/discord-rpc";
+import RPC from "@ankziety/discord-rpc";
 import { DeskThingClass } from "deskthing-server";
-import { discordData, UserData, UserVoiceState } from "../src/types/discord.d";
-
-type subscriptions = {
-  voice: { [key: string]: Subscription[] };
-};
+import {
+  DiscordEventData,
+  UserData,
+  UserVoiceState,
+  DiscordEventChannel,
+  Notification,
+  subscriptions,
+} from "../src/types/discord.d";
 
 class DiscordHandler {
   private DeskThingServer: DeskThingClass;
-  // @ts-ignore
   private rpc: RPC.Client = new RPC.Client({ transport: "ipc" });
   private subscriptions: subscriptions = { voice: {} };
   private startTimestamp: Date | null;
@@ -19,8 +20,8 @@ class DiscordHandler {
   private client_secret: string | undefined = undefined;
   private token: string | undefined = undefined;
   private connectedUserList: UserData[];
-  private selectedChannel: Channel | null = null;
-  private recentChannels: Channel[];
+  private selectedChannel: DiscordEventChannel | null = null;
+  private recentChannels: DiscordEventChannel[] = [];
 
   constructor(DeskThing: DeskThingClass) {
     this.DeskThingServer = DeskThing;
@@ -40,7 +41,19 @@ class DiscordHandler {
   }
 
   /**
-   * RPC Setup Functions
+   * Override Methods
+   */
+
+  sendEror(error: string) {
+    this.DeskThingServer.sendError(`[Discord] ${error}`);
+  }
+
+  sendLog(log: string) {
+    this.DeskThingServer.sendLog(`[Discord] ${log}`);
+  }
+
+  /**
+   * RPC Setup Methods
    */
 
   // Register the RPC client and login
@@ -83,7 +96,6 @@ class DiscordHandler {
 
       if (!this.token) {
         // Authorize and get the access token
-        // @ts-ignore - The 'authorize' method may not be in the type definitions
         this.token = await this.rpc.authorize({
           scopes: this.scopes,
           clientSecret: this.client_secret,
@@ -213,7 +225,7 @@ class DiscordHandler {
   }
 
   /**
-   * Helper Functions
+   * Helper Methods
    */
 
   // Subscribe to necessary Discord RPC events
@@ -295,6 +307,8 @@ class DiscordHandler {
 
   async hydrateUsers() {
     this.DeskThingServer.sendLog("[Server] Attempting to hydrate users");
+    if (this.selectedChannel == null)
+      return this.sendEror(`No selected channel to hydrate users from`);
     if (this.selectedChannel.voice_states) {
       for (const voiceState of this.selectedChannel.voice_states) {
         if (voiceState.user) await this.mergeUserData(voiceState.user);
@@ -336,7 +350,7 @@ class DiscordHandler {
   // Leave the current voice call
   async leaveCall() {
     this.DeskThingServer.sendLog("Attempting to leave call...");
-    // @ts-ignore
+    // @ts-expect-error
     await this.rpc.selectVoiceChannel(null);
   }
 
@@ -380,7 +394,7 @@ class DiscordHandler {
    * Event Handlers
    */
 
-  async handleNotificationCreate(args: any) {
+  async handleNotificationCreate(args: Notification) {
     this.DeskThingServer.sendLog(
       `Handling Notification Create: ${JSON.stringify(args)}`
     );
@@ -399,7 +413,7 @@ class DiscordHandler {
   }
 
   // Handle when a user joins the voice channel
-  async handleVoiceStateCreate(args: discordData) {
+  async handleVoiceStateCreate(args: DiscordEventData) {
     this.DeskThingServer.sendLog(
       `Handling Voice State Create: ${JSON.stringify(args)}`
     );
@@ -409,11 +423,9 @@ class DiscordHandler {
       nick: args.nick,
       speaking: false,
       volume: args.volume,
-      mute:
-        args.voice_state.mute ||
-        args.voice_state.self_mute ||
-        args.voice_state.suppress,
+      mute: args.voice_state.mute || args.voice_state.self_mute,
       deaf: args.voice_state.deaf || args.voice_state.self_deaf,
+      suppressed: args.voice_state.suppress,
       avatar: args.user.avatar,
       profile: undefined,
     };
@@ -434,7 +446,7 @@ class DiscordHandler {
   }
 
   // Handle when a user leaves the voice channel
-  async handleVoiceStateDelete(args: discordData) {
+  async handleVoiceStateDelete(args: DiscordEventData) {
     this.DeskThingServer.sendLog(
       `Handling Voice State Delete: ${JSON.stringify(args)}`
     );
@@ -456,7 +468,7 @@ class DiscordHandler {
   }
 
   // Handle updates to a user's voice state
-  async handleVoiceStateUpdate(args: discordData) {
+  async handleVoiceStateUpdate(args: DiscordEventData) {
     this.DeskThingServer.sendLog(
       `Handling Voice State Update: ${JSON.stringify(args)}`
     );
@@ -466,10 +478,9 @@ class DiscordHandler {
       nick: args.nick,
       speaking: false,
       volume: args.volume,
-      // @ts-expect-error
       mute: args.voice_state.mute || args.voice_state.self_mute,
-      // @ts-expect-error
       deaf: args.voice_state.deaf || args.voice_state.self_deaf,
+      suppressed: args.voice_state.suppress,
     };
 
     const mergedUser = await this.mergeUserData(userData);
@@ -523,7 +534,7 @@ class DiscordHandler {
   }
 
   // Handle voice connection status changes
-  async handleVoiceConnectionStatus(args: discordData) {
+  async handleVoiceConnectionStatus(args: DiscordEventData) {
     // this.DeskThingServer.sendLog(
     //   `Handling Voice Connection Status: ${JSON.stringify(args)}`
     // );
@@ -642,7 +653,7 @@ class DiscordHandler {
     const channel = await this.rpc.getSelectedChannel();
     if (!channel)
       throw this.DeskThingServer.sendError(
-        "[Server] Channel could not be fetched"
+        "[Server] DiscordEventChannel could not be fetched"
       );
 
     this.selectedChannel = channel;

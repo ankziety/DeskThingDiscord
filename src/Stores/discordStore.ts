@@ -1,16 +1,15 @@
 import { DeskThing } from "deskthing-client";
 import { SocketData } from "deskthing-client/dist/types";
-import { Channel } from "@ankziety/discord-rpc";
 import {
   ChannelInfoTransport,
   ChannelMemberDataTransport,
+  EventUpdateCallbacks,
   NotificationDataTransport,
   UserData,
   VoiceActivityDataTransport,
   VoiceStateDataTransport,
+  DiscordEventChannel,
 } from "../types/discord";
-
-type EventUpdateCallbacks = (data: any) => void;
 
 class DiscordStore {
   private DeskThingClient: typeof DeskThing;
@@ -34,7 +33,7 @@ class DiscordStore {
   }[] = []; // Will be used later for notifications
 
   // Channel data and callbacks for channel updates
-  private channelData: Channel | null = null;
+  private channelData: DiscordEventChannel | null = null;
 
   // Debounce flag for speaking updates
   private speakingUpdateTimeout: { [key: string]: NodeJS.Timeout } = {};
@@ -245,7 +244,7 @@ class DiscordStore {
   handleNotificationData = (data: NotificationDataTransport) => {
     const payload = { ...data.payload, stackTimestamp: new Date() };
     if (payload) {
-      this.notificationStack.push(payload);
+      // this.notificationStack.push(payload);
       this.publishNotificationData();
     }
   };
@@ -256,7 +255,7 @@ class DiscordStore {
   }
 
   // Get the current channel data
-  getChannelData(): any {
+  getChannelData(): DiscordEventChannel | null {
     return this.channelData;
   }
 

@@ -1,0 +1,53 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="."><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>discordthing</title><meta name="description" content="Documentation for discordthing"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><div class="table-cell" id="tsd-search"><div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div><div class="field"><div id="tsd-toolbar-links"></div></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">discordthing</a></div><div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h1>discordthing</h1></div><div class="tsd-panel tsd-typography"><a id="deskthing-discord-app" class="tsd-anchor"></a><h1 class="tsd-anchor-link">Deskthing Discord App<a href="#deskthing-discord-app" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><blockquote>
+<p><strong>v0.0.1</strong><br>
+<em>Code by:</em> <strong>Ankziety</strong><br>
+<em>Based on code by:</em> <strong>Riprod</strong></p>
+</blockquote>
+<p><strong>How to Make a Discord Developer Team and App</strong></p>
+<p>Follow these steps to create a Discord Developer Team, set up an app for it, and set up the OAuth settings. This guide will allow you to connect your discord client to deskthing via local RPC.</p>
+<hr>
+<a id="1-make-a-discord-developer-team" class="tsd-anchor"></a><h3 class="tsd-anchor-link">1. Make a Discord Developer Team<a href="#1-make-a-discord-developer-team" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ol>
+<li>Open your web browser and go to the Discord Developer Teams page:
+<ul>
+<li><a href="https://discord.com/developers/teams">Discord Developer Teams</a></li>
+</ul>
+</li>
+<li>Log in to your Discord account. If you don’t have one, you’ll need to make one by signing up.</li>
+<li>Click on <strong>Create Team</strong>. This will open a page where you can give your team a name and fill out some simple details.</li>
+<li>Type in a name for your team. Pick something that makes sense for what you’re working on.</li>
+<li>That’s it! Your team is now set up and ready.</li>
+</ol>
+<hr>
+<a id="2-create-a-new-app-for-your-team" class="tsd-anchor"></a><h3 class="tsd-anchor-link">2. Create a New App for Your Team<a href="#2-create-a-new-app-for-your-team" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ol>
+<li>Go to the Discord Developer Applications page:
+<ul>
+<li><a href="https://discord.com/developers/applications">Discord Developer Applications</a></li>
+</ul>
+</li>
+<li>Log in if it asks you to.</li>
+<li>Click <strong>New Application</strong>. A screen will pop up asking for some information.</li>
+<li>Enter a name for your app. After that, make sure to choose your team, as the owner, instead of your personal account.</li>
+<li>Click <strong>Create</strong> to finish setting up the app under your team.</li>
+</ol>
+<hr>
+<a id="3-add-yourself-as-a-tester" class="tsd-anchor"></a><h3 class="tsd-anchor-link">3. Add Yourself as a Tester<a href="#3-add-yourself-as-a-tester" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ol>
+<li>In your app’s settings, look for the <strong>App Testers</strong> section in the menu.</li>
+<li>Add your Discord account as a tester. Type in your username or ID.</li>
+<li>Check your email for an invite. Open the email and accept the invitation.</li>
+<li>Once accepted, your account is now set as a tester for the app.</li>
+</ol>
+<hr>
+<a id="4-set-up-oauth-settings" class="tsd-anchor"></a><h3 class="tsd-anchor-link">4. Set Up OAuth Settings<a href="#4-set-up-oauth-settings" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ol>
+<li>Go to the <strong>OAuth2</strong> section in the app’s settings.</li>
+<li>Find the field for <strong>Redirects</strong> or <strong>Callback URLs</strong>. Add the correct URL here, which should come from the project you’re working on.</li>
+<li>After setting the redirect, click the option to reset your client secret. This will show you a new secret key.</li>
+<li>Copy and paste both the <strong>Client ID</strong> and <strong>Client Secret</strong> into your project’s settings or wherever it’s needed. Make sure to save these somewhere safe.</li>
+</ol>
+<hr>
+<a id="5-troubleshooting-and-support" class="tsd-anchor"></a><h3 class="tsd-anchor-link">5. Troubleshooting and Support<a href="#5-troubleshooting-and-support" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-alert tsd-alert-tip"><div class="tsd-alert-title"><svg width="16" height="16" viewBox="0 0 16 16"><use href="assets/icons.svg#icon-alertTip"></use></svg><span>Tip</span></div><p>
+You can try pausing and unpausing the app in the Developer Portal to restart it. This might fix some bugs.</p>
+</div>
+<div class="tsd-alert tsd-alert-important"><div class="tsd-alert-title"><svg width="16" height="16" viewBox="0 0 16 16"><use href="assets/icons.svg#icon-alertImportant"></use></svg><span>Important</span></div><p>
+You must be an app tester registered with the team application for RPC to connect.</p>
+</div>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#deskthing-discord-app"><span>Deskthing <wbr/>Discord <wbr/>App</span></a><ul><li><a href="#1-make-a-discord-developer-team"><span>1. <wbr/>Make a <wbr/>Discord <wbr/>Developer <wbr/>Team</span></a></li><li><a href="#2-create-a-new-app-for-your-team"><span>2. <wbr/>Create a <wbr/>New <wbr/>App for <wbr/>Your <wbr/>Team</span></a></li><li><a href="#3-add-yourself-as-a-tester"><span>3. <wbr/>Add <wbr/>Yourself as a <wbr/>Tester</span></a></li><li><a href="#4-set-up-oauth-settings"><span>4. <wbr/>Set <wbr/>Up OAuth <wbr/>Settings</span></a></li><li><a href="#5-troubleshooting-and-support"><span>5. <wbr/>Troubleshooting and <wbr/>Support</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html">discordthing</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>

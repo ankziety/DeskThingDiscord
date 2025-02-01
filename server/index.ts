@@ -3,14 +3,16 @@ import { DeskThing as DK, SocketData } from "deskthing-server";
 export { DK as DeskThing };
 
 const DeskThingServer = DK;
-let discord: DiscordHandler;
+let discord: DiscordHandler | null = null;
 
 const main = async () => {
   // Set Data object and ensure it is up-to-date
   let data = await DeskThingServer.getData();
   DeskThingServer.on("data", (newData) => {
     data = newData;
-    DeskThingServer.sendLog("Data object has been updated");
+    DeskThingServer.sendLog(
+      `[Discord] Data object has been updated ${JSON.stringify(newData)}`
+    );
   });
 
   // Initialize settings
@@ -68,7 +70,7 @@ const main = async () => {
         await discord.registerRPC();
       } else {
         DeskThingServer.sendError(
-          "Please fill out all the fields! Restart Discord to try again"
+          "[Discord] Please fill out all the fields! Restart Discord to try again"
         );
       }
     });
@@ -80,14 +82,17 @@ const main = async () => {
   DeskThingServer.on("set", handleSet);
   DeskThingServer.on("get", handleGet);
 
-  DeskThingServer.sendLog("Discord app started successfully.");
+  DeskThingServer.sendLog("[Server] Discord app started successfully.");
 };
 
 const handleSet = (data: SocketData) => {
   if (!data.request) {
-    DeskThingServer.sendError("No request provided in 'set' data.");
+    DeskThingServer.sendError("[Discord] No request provided in 'set' data.");
     return;
   }
+
+  if (discord === null)
+    throw new Error("[Discord] Discord client not initialized");
 
   switch (data.request) {
     case "hangup":
@@ -104,7 +109,9 @@ const handleSet = (data: SocketData) => {
       discord.setUserVoiceState(data.payload);
       break;
     default:
-      DeskThingServer.sendError(`Unhandled 'set' request: ${data.request}`);
+      DeskThingServer.sendError(
+        `[Discord] Unhandled 'set' request: ${data.request}`
+      );
       break;
   }
 };
@@ -117,15 +124,20 @@ const handleGet = (data: SocketData) => {
   // DeskThingServer.sendLog(`New data get request ${JSON.stringify(data)}`);
 
   if (!data.request) {
-    DeskThingServer.sendError("No request provided in 'get' data.");
+    DeskThingServer.sendError("[Discord] No request provided in 'get' data.");
     return;
   }
 
+  if (discord === null)
+    throw new Error("[Discord] Discord client not initialized");
+
   if (data.request == "refresh_call") {
-    DeskThingServer.sendLog("Sending requested call data to clients");
+    DeskThingServer.sendLog("[Discord] Refreshing call data");
     discord.refreshCallData();
   } else {
-    DeskThingServer.sendError(`Unhandled 'get' request: ${data.request}`);
+    DeskThingServer.sendError(
+      `[Discord] Unhandled 'get' request: ${data.request}`
+    );
   }
 };
 
@@ -133,10 +145,15 @@ const handleGet = (data: SocketData) => {
 DeskThingServer.on("start", main);
 
 DeskThingServer.on("stop", () => {
-  DeskThingServer.sendError("Stopping discord application");
+  DeskThingServer.sendError("[Discord] Stopping discord application");
+  DeskThingServer.off("set", handleSet);
+  DeskThingServer.off("get", handleGet);
   if (discord) {
     discord.destroy();
-    DeskThingServer.off("set", handleSet);
-    DeskThingServer.off("get", handleGet);
+    discord = null;
   }
+});
+
+DeskThingServer.on("purge", () => {
+  DeskThingServer.sendError("[Discord] Purging discord application");
 });
