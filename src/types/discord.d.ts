@@ -11,6 +11,8 @@ export interface UserData {
   avatar?: string;
   mute?: boolean;
   deaf?: boolean;
+  suppressed?: boolean;
+  is_self?: boolean; // true if the user is the client
   profile?: string;
 }
 
