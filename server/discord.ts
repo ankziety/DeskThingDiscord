@@ -129,6 +129,7 @@ class DiscordHandler {
         const setActivity = (await this.DeskThingServer.getData())?.settings
           ?.activity?.value;
         if (setActivity) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const cancelTask = this.DeskThingServer.addBackgroundTaskLoop(
             async () => {
               this.rpc.clearActivity();
@@ -402,6 +403,7 @@ class DiscordHandler {
       title: args.title,
       body: args.body,
       id: args.message.id,
+      author: args.message.author,
     };
     if (notificationData) {
       this.DeskThingServer.send({
@@ -629,6 +631,7 @@ class DiscordHandler {
   }
 
   // Change voice settings (mute, deafened)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async setClientVoiceSetting(data: any) {
     this.DeskThingServer.sendLog(
       `Attempting to change voice setting to: ${JSON.stringify(data)}`

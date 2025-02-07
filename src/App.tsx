@@ -1,14 +1,18 @@
 import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Call } from "./components/Call";
-import ErrorBoundary from "./components/ErrorBoundary";
+import NotificationsPage from "./pages/NotificationsPage";
 
 const App: React.FC = () => {
   return (
-    <div className="bg-slate-800 w-screen h-screen flex-col flex justify-center items-center">
-      <ErrorBoundary>
-        <Call />
-      </ErrorBoundary>
-    </div>
+    <Router>
+      <div className="bg-slate-800 w-screen h-screen flex-col flex justify-center items-center">
+        <Routes>
+          <Route path="/call" element={<Call />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 };
 

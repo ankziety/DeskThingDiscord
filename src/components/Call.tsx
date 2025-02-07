@@ -5,39 +5,37 @@ import {
   IconDeafenedDiscord,
   IconMicOffDiscord,
   IconUserCircle,
+  IconBell,
 } from "../assets/icons";
 import ChannelBanner from "./ChannelBanner";
 import NotificationBanner from "./NotificationBanner";
-// import NotificationList from "./NotificationList";
-// import UserDetailPanel from "./UserDetailPanel";
-import { UserData } from "../types/discord";
+import { Notification, UserData } from "../types/discord";
+import { Link } from "react-router-dom";
 
 export const Call = () => {
   const [callData, setCallData] = useState<UserData[]>(
     discordStore.getCallData()
   );
-  // const [notifications, setNotifications] = useState<any[]>([]);
-  const [currentNotification, setCurrentNotification] = useState<any | null>(
-    null
-  );
-  // const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [currentNotification, setCurrentNotification] =
+    useState<Notification | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const handleCallDataUpdate = (data: UserData[]) => {
     setCallData(data);
   };
 
-  const addNotification = (notif: any) => {
-    // setNotifications((notifs) => [...notifs, notif]);
+  const addNotification = (notif: Notification) => {
+    setNotifications((notifs) => [...notifs, notif]);
+    localStorage.setItem(
+      "notifications",
+      JSON.stringify([...notifications, notif])
+    );
     setCurrentNotification(notif);
   };
 
   const handleNotificationClose = () => {
     setCurrentNotification(null);
   };
-
-  // const handleSelectUser = (user: UserData) => {
-  //   setSelectedUser(user);
-  // };
 
   useEffect(() => {
     // Request initial call data
@@ -58,34 +56,38 @@ export const Call = () => {
   // Helper function to create a volume border based on user's volume
   const getVolumeBorder = (volume: number) => {
     const degree = (volume / 200) * 360;
-    return `conic-gradient(indigo ${degree}deg, transparent ${degree}deg)`;
+    // Fallback for older browsers that might not support conic-gradient
+    return `linear-gradient(indigo ${degree}deg, transparent ${degree}deg)`;
   };
 
   return (
     <div className="flex flex-col w-screen h-screen bg-gray-900 text-white">
-      {currentNotification && (
-        <NotificationBanner
-          notification={currentNotification}
-          onClose={handleNotificationClose}
-        />
-      )}
-      {/* <NotificationList notifications={notifications} /> */}
-      {/* Channel information banner */}
-      <ChannelBanner />
+      <div className="relative">
+        {currentNotification && (
+          <NotificationBanner
+            notification={currentNotification}
+            onClose={handleNotificationClose}
+          />
+        )}
+        <Link
+          to="/notifications"
+          className="absolute top-2 right-4 bg-gray-700 text-white rounded-full p-2 hover:bg-gray-600 focus:outline-none"
+        >
+          <IconBell className="h-6 w-6" />
+          {notifications.length > 0 && (
+            <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+          )}
+        </Link>
+        <ChannelBanner />
+      </div>
+
       {/* Participants display area */}
-      {/* {selectedUser ? (
-        <UserDetailPanel
-          user={selectedUser}
-          onBack={() => setSelectedUser(null)}
-        />
-      ) : ( */}
       <div className="flex-1 flex flex-wrap justify-center items-center p-4 overflow-y-auto">
         {callData && callData.length > 0 ? (
           callData.map((participant) => (
             <div
               key={participant.id}
               className="flex flex-col items-center m-3"
-              // onClick={() => handleSelectUser(participant)}
             >
               {participant.profile ? (
                 <div className="relative w-40 h-40">
@@ -110,7 +112,7 @@ export const Call = () => {
                     />
                   </div>
                   {/* Mute and deafened indicators */}
-                  <div className="absolute right-0 bottom-0 text-red-500 fill-current">
+                  <div className="absolute right-0 bottom-0 text-red-500 fill-current flex gap-1">
                     {participant.mute && <IconMicOffDiscord />}
                     {participant.deaf && <IconDeafenedDiscord />}
                   </div>
@@ -135,19 +137,42 @@ export const Call = () => {
             className="text-center text-gray-500"
             onClick={() =>
               addNotification({
-                title: "test",
-                body: "This is a test notification, but it is longer, you could say mid length, maybe even long, who knows? Now it is a bit longer than expected, but it is a test nonetheless. Let's see if it works! Ok, let's make it even longer to test the limits of the notification system. Is this too long? Let's find out!",
-                id: "1",
-                stackTimestamp: new Date(),
+                title: "Test Notification",
+                body: "This is a test notification body for testing purposes. Much longer text that is used to test the overflow of the notification banner. This is a test notification body for testing purposes. Much longer text that is used to test the overflow of the notification banner. This is a test notification body for testing purposes. Much longer text that is used to test the overflow of the notification banner. This is a test notification body for testing purposes. Much longer text that is used to test the overflow of the notification banner.",
+                message: {
+                  author: {
+                    username: "DeskThing",
+                    id: "",
+                    discriminator: "",
+                    global_name: "",
+                    avatar: "",
+                    avatar_decoration_data: undefined,
+                    bot: false,
+                    flags: 0,
+                    premium_type: 0,
+                  },
+                  id: "",
+                  content: "",
+                  content_parsed: [],
+                  nick: "",
+                  timestamp: "",
+                  tts: false,
+                  mentions: [],
+                  mention_roles: [],
+                  embeds: [],
+                  attachments: [],
+                  pinned: false,
+                  type: 0,
+                },
+                channel_id: "",
+                icon_url: "",
               })
             }
           >
-            {" "}
             No participants in the call
           </p>
         )}
       </div>
-      {/* )} */}
       {/* Controls component */}
       <Controls />
     </div>

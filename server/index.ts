@@ -20,7 +20,9 @@ const main = async () => {
     !data?.settings?.auto_switch_view ||
     !data.settings?.notifications ||
     !data.settings?.activity ||
-    !data.settings?.dm_notifications
+    !data.settings?.dm_notifications ||
+    !data.settings?.guild_notifications ||
+    !data.settings?.notification_timeout
   ) {
     DeskThingServer.addSettings({
       auto_switch_view: {
@@ -37,6 +39,18 @@ const main = async () => {
         label: "Display DM Notifications",
         type: "boolean",
         value: true,
+      },
+      guild_notifications: {
+        label: "Display Guild Notifications",
+        type: "boolean",
+        value: true,
+      },
+      notification_timeout: {
+        label: "Notification Timeout (s) (0 = never)",
+        type: "number",
+        value: 5,
+        min: 0,
+        max: 60,
       },
     });
   }
@@ -154,6 +168,6 @@ DeskThingServer.on("stop", () => {
   }
 });
 
-DeskThingServer.on("purge", () => {
+DeskThingServer.once("purge", () => {
   DeskThingServer.sendError("[Discord] Purging discord application");
 });

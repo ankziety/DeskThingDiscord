@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-
-interface Notification {
-  id: string;
-  body: string;
-  title: string;
-  stackTimestamp: Date;
-}
+import { Notification } from "../types/discord";
 
 interface NotificationBannerProps {
   notification: Notification;
@@ -20,37 +14,62 @@ const NotificationBanner: React.FC<NotificationBannerProps> = ({
 
   useEffect(() => {
     setIsVisible(true);
-    const timer = setTimeout(onClose, 5000);
+    const timer = setTimeout(onClose, 20000);
     return () => clearTimeout(timer);
   }, [onClose]);
 
   return (
     <div
-      className={`fixed top-0 left-1/2 transform -translate-x-1/2 p-4 text-center transition-transform duration-500 ease-in-out ${
+      className={`fixed top-4 left-1/2 transform -translate-x-1/2 p-4 text-center transition-transform duration-500 ease-in-out z-100 ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
       style={{
-        background: "rgba(54, 57, 63, 0.9)", // Discord-like background
-        border: "1px solid rgba(255, 255, 255, 0.1)",
-        backdropFilter: "blur(10px)", // Attempt to create a glass effect
-        WebkitBackdropFilter: "blur(10px)", // For older versions of WebKit
+        background:
+          "linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0))",
+        border: "1px solid rgba(255, 255, 255, 0.18)",
+        borderRadius: "8px",
+        boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
         color: "white",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        borderRadius: "8px", // Ensure all corners are rounded
         margin: "10px",
-        overflow: "hidden", // Ensure content does not overflow
-        width: "95%", // Ensure it fits within the screen
-        maxWidth: "600px", // Limit the maximum width
+        overflow: "hidden",
+        width: "95%",
+        maxWidth: "600px",
+        maxHeight: "200px",
+        position: "relative",
       }}
     >
+      <button
+        onClick={onClose}
+        className="text-gray-500 hover:text-white focus:outline-none absolute top-2 right-2"
+      >
+        <svg
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
       <strong
-        style={{ fontSize: "1.2em", display: "block", marginBottom: "5px" }}
+        style={{
+          fontSize: "1.2em",
+          display: "block",
+          marginBottom: "5px",
+        }}
       >
         {notification.title}
       </strong>
-      <p style={{ margin: "5px 0" }}>{notification.body}</p>
+      <p className="max-h-10 overflow-hidden text-ellipsis">
+        {notification.body}
+      </p>
       <small style={{ display: "block", marginTop: "5px", color: "#b9bbbe" }}>
-        {notification.stackTimestamp.toLocaleString()}
+        {notification.message.author.username}
       </small>
     </div>
   );
